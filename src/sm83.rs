@@ -41,7 +41,7 @@ impl SM83 {
         let mut properties = ExecutionProperties::new(0, 0);
 
         // Beautiful binary search
-        if *opcode & 0b1000000 == 0b10000000 {
+        if *opcode & 0b10000000 == 0b10000000 {
             if *opcode & 0b01000000 == 0b01000000 { // 0b11xxxxxx
 
             } else { // 0b10xxxxxx

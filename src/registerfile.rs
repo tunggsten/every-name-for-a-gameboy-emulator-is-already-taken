@@ -44,7 +44,7 @@ impl RegisterFile {
             0b011 => Ok(self.e),
             0b100 => Ok(self.h),
             0b101 => Ok(self.l),
-            0b110 =>
+            0b110 => Err(String::from("Tried reading a memory read command as a register; you should be handling this case separately!")),
             _ => Err(String::from("Tried to read from a nonexistent register!")),
         }
     }
