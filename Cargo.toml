@@ -1,0 +1,6 @@
+[package]
+name = "every-name-for-a-gameboy-emulator-is-already-taken"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
