@@ -16,8 +16,8 @@ impl Pointer {
         }
     }
 
-    pub fn read(&self) -> &u16 {
-        &self.value
+    pub fn read(&self) -> u16 {
+        self.value
     }
 
     pub fn jump(&mut self, value: u16) {

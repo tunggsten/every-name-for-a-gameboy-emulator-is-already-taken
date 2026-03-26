@@ -64,10 +64,13 @@ impl RegisterFile {
         Ok(())
     }
 
-    pub fn read_register_pair(&self, left_index: u8, right_index: u8) -> Result<u16, String> {
-        let left = self.read_register(left_index)?;
-        let right = self.read_register(right_index)?;
-
-        return Ok(left as u16 * 0x100 + right as u16)
+    pub fn read_register_pair(&self, index: u8) -> Result<u16, String> {
+        match index {
+            0b00 => { Ok((self.b as u16) * 0x100 + self.c as u16) }
+            0b01 => { Ok((self.d as u16) * 0x100 + self.e as u16) }
+            0b10 => { Ok((self.h as u16) * 0x100 + self.l as u16) }
+            0b11 => { Ok(self.stack_pointer.read()) }
+            _ => { Err(String::from("Tried to read from a nonexistent register pair!"))}
+        }
     }
 }

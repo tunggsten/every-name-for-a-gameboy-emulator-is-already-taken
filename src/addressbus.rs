@@ -11,12 +11,12 @@ impl AddressBus {
         }
     }
 
-    pub fn read(&self, address: u16) -> Result<&u8, String> {
+    pub fn read(&self, address: u16) -> Result<u8, String> {
         if address as usize > self.memory.len() {
             return Err(String::from("Address bus index was out of range!"));
         }
 
-        Ok(&self.memory[address as usize])
+        Ok(self.memory[address as usize])
     }
 
     pub fn write(&mut self, address: u16, contents: u8) -> Result<(), String> {

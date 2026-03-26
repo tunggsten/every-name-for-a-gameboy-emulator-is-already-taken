@@ -1,7 +1,9 @@
-use crate::instructions::executionproperties::ExecutionProperties;
 use crate::instructions::instruction::Instruction;
+use crate::instructions::arithmetic::eightbitimmediatearithmetic::EightBitImmediateArithmetic;
+use crate::instructions::arithmetic::eightbitregisterarithmetic::EightBitRegisterArithmetic;
+use crate::instructions::eightbitregisterload::EightBitRegisterLoad;
+use crate::instructions::executionproperties::ExecutionProperties;
 use crate::registerfile::RegisterFile;
-use crate::instructions::{eightbitarithmetic, eightbitload};
 use crate::addressbus::AddressBus;
 
 pub struct SM83 {
@@ -28,7 +30,7 @@ impl SM83 {
             0b011 => Ok(self.register_file.e),
             0b100 => Ok(self.register_file.h),
             0b101 => Ok(self.register_file.l),
-            0b110 => Ok(*self.address_bus.read(self.register_file.h as u16 >> 8 + self.register_file.l as u16)?),
+            0b110 => Ok(self.address_bus.read(self.register_file.read_register_pair(0b10)?)?),
             0b111 => Ok(self.register_file.accumulator),
             _ => Err(String::from("Tried reading from a nonexistent code!")),
         }
@@ -41,15 +43,17 @@ impl SM83 {
         let mut properties = ExecutionProperties::new(0, 0);
 
         // Beautiful binary search
-        if *opcode & 0b10000000 == 0b10000000 {
-            if *opcode & 0b01000000 == 0b01000000 { // 0b11xxxxxx
-
+        if opcode & 0b10000000 == 0b10000000 {
+            if opcode & 0b01000000 == 0b01000000 { // 0b11xxxxxx
+                if opcode & 0b00000111 == 0b00000110 {
+                    properties = EightBitImmediateArithmetic::execute(self, opcode)?;
+                }
             } else { // 0b10xxxxxx
-                properties = eightbitarithmetic::EightBitArithmetic::execute(self, *opcode)?;
+                properties = EightBitRegisterArithmetic::execute(self, opcode)?;
             }
         } else {
-            if *opcode & 0b01000000 == 0b01000000 { // 0b01xxxxxx
-                properties = eightbitload::TwoRegisterLD::execute(self, *opcode)?;
+            if opcode & 0b01000000 == 0b01000000 { // 0b01xxxxxx
+                properties = EightBitRegisterLoad::execute(self, opcode)?;
             } else { // 0b00xxxxxx
 
             }
@@ -59,7 +63,7 @@ impl SM83 {
     }
 
     pub fn fde_cycle(&mut self) -> Result<(), String> {
-        let properties = self.decode_and_execute_instruction(*self.register_file.program_counter.read())?;
+        let properties = self.decode_and_execute_instruction(self.register_file.program_counter.read())?;
 
         self.register_file.program_counter.jump(properties.program_counter_target);
 

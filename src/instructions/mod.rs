@@ -1,4 +1,5 @@
-pub mod eightbitarithmetic;
-pub mod eightbitload;
+pub mod arithmetic;
+
+pub mod eightbitregisterload;
 pub mod executionproperties;
 pub mod instruction;
